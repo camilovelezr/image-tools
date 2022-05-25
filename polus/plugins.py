@@ -319,7 +319,7 @@ class PluginMethods:
                 args.append(f"--{i.name}")
 
                 if isinstance(i.value, pathlib.Path):
-                    args.append(f"'{inp_dirs_dict[str(i.value)]}'")
+                    args.append(inp_dirs_dict[str(i.value)])
 
                 elif isinstance(i.value, enum.Enum):
                     args.append(f"'{str(i.value._name_)}'")
@@ -333,7 +333,7 @@ class PluginMethods:
                 args.append(f"--{o.name}")
 
                 if isinstance(o.value, pathlib.Path):
-                    args.append(f"'{out_dirs_dict[str(o.value)]}'")
+                    args.append(out_dirs_dict[str(o.value)])
 
                 elif isinstance(o.value, enum.Enum):
                     args.append(f"'{str(o.value._name_)}'")
