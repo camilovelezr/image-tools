@@ -315,29 +315,31 @@ class PluginMethods:
 
         for i in self.inputs:
             i._validate()
-            args.append(f"--{i.name}")
+            if i.value:  # not None
+                args.append(f"--{i.name}")
 
-            if isinstance(i.value, pathlib.Path):
-                args.append(inp_dirs_dict[str(i.value)])
+                if isinstance(i.value, pathlib.Path):
+                    args.append(f"'{inp_dirs_dict[str(i.value)]}'")
 
-            elif isinstance(i.value, enum.Enum):
-                args.append(str(i.value._name_))
+                elif isinstance(i.value, enum.Enum):
+                    args.append(f"'{str(i.value._name_)}'")
 
-            else:
-                args.append(str(i.value))
+                else:
+                    args.append(f"'{str(i.value)}'")
 
         for o in self.outputs:
             o._validate()
-            args.append(f"--{o.name}")
+            if o.value:  # not None
+                args.append(f"--{o.name}")
 
-            if isinstance(o.value, pathlib.Path):
-                args.append(out_dirs_dict[str(o.value)])
+                if isinstance(o.value, pathlib.Path):
+                    args.append(f"'{out_dirs_dict[str(o.value)]}'")
 
-            elif isinstance(o.value, enum.Enum):
-                args.append(str(o.value._name_))
+                elif isinstance(o.value, enum.Enum):
+                    args.append(f"'{str(o.value._name_)}'")
 
-            else:
-                args.append(str(o.value))
+                else:
+                    args.append(f"'{str(o.value)}'")
 
         container_name = f"polus{random.randint(10, 99)}"
 
