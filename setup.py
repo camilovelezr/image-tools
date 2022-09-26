@@ -40,5 +40,6 @@ setup(
         "tqdm>=4.64.0",
         "xmltodict>=0.12.0",
         "fsspec>=2021.11.0",
+        "PyYAML==6.0",
     ],
 )
