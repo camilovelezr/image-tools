@@ -18,6 +18,6 @@ lc = LoadingContext({"debug": True})
 args = p._cwl_io()
 rc = RuntimeContext({"no_read_only": True})
 fac = Factory(loading_context=lc, runtime_context=rc)
-plugin_cwl = fac.make("/Users/camilovelezr/omezarr.cwl")
+plugin_cwl = fac.make("/Users/camilovelezr/polus-plugins/examples_cwl/omezarr.cwl")
 # args["entrypoint"] = "python3 ../main.py"
 result = plugin_cwl(**args)

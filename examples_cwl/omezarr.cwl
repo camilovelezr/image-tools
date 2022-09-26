@@ -1,29 +1,33 @@
-class: CommandLineTool
+#!/usr/bin/env cwl-runner
+
 cwlVersion: v1.2
-baseCommand: ["python3", "/opt/executables/main.py"]
-hints:
-  DockerRequirement:
-    dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
+class: CommandLineTool
+
 requirements:
   InlineJavascriptRequirement: {}
-  InitialWorkDirRequirement:
-    listing:
-      - {entry: "$({class: 'Directory', listing: []})", entryname: $(inputs.outDir.location), writable: true}
+
 inputs:
   filePattern:
+    type: string
     inputBinding:
       prefix: --filePattern
-    type: string
   inpDir:
+    type: Directory
     inputBinding:
       prefix: --inpDir
-    type: Directory
   outDir:
+    type: Directory
     inputBinding:
       prefix: --outDir
-    type: Directory
+
 outputs:
   out:
     type: Directory
-    outputBinding:
-      glob: "$(inputs.outDir.path)"
+
+baseCommand:
+- python3
+- /opt/executables/main.py
+
+hints:
+  DockerRequirement:
+    dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
