@@ -176,11 +176,11 @@ class Plugin(WIPPPluginManifest, PluginMethods):
         self,
         path: typing.Union[str, pathlib.Path],
         hardware_requirements: typing.Optional[dict] = None,
-        new: bool = False,
+        compute: bool = False,
     ):
-        if new:
+        if compute:
             with open(path, "w") as fw:
-                self.new_schema(
+                self.to_compute(
                     hardware_requirements=hardware_requirements
                 ).save_manifest(path)
         else:
