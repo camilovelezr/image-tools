@@ -11,16 +11,9 @@ def export_ts(session: Session) -> None:
     session.install("-r", "requirements-dev.txt")
 
     session.run(
-        "datamodel-codegen",
-        "--input",
-        "./polus/_plugins/models/PolusComputeSchema.json",
-        "--output",
-        "./polus/_plugins/models/PolusComputeSchema.py",
-    )
-    session.run(
         "pydantic2ts",
         "--module",
-        "./polus/_plugins/models/PolusComputeSchema.py",
+        "./polus/_plugins/PolusComputeSchema.py",
         "--output",
-        "./polus/_plugins/models/PolusComputeSchema.ts",
+        "./polus/_plugins/PolusComputeSchema.ts",
     )

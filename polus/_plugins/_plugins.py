@@ -1,19 +1,28 @@
 from copy import deepcopy
-from pprint import pprint, pformat
+from pprint import pformat
 import typing
 from ._io import Version, DuplicateVersionFound
-from .models.wipp import WIPPPluginManifest
-from ._utils import name_cleaner, cast_version
+from ._plugin_model import WIPPPluginManifest
+from ._utils import (
+    name_cleaner,
+    input_to_cwl,
+    output_to_cwl,
+    outputs_cwl,
+    io_to_yml,
+    cast_version,
+)
 from ._plugin_methods import PluginMethods
-from .models.compute import PluginUIInput, PluginUIOutput
-from .models.compute import PluginSchema as ComputeSchema
+from .PolusComputeSchema import PluginUIInput, PluginUIOutput
+from .PolusComputeSchema import PluginSchema as ComputeSchema
 from ._manifests import _load_manifest, validate_manifest
 from ._io import Version, DuplicateVersionFound, _in_old_to_new, _ui_old_to_new
+from ._cwl import CWL_BASE_DICT
 from pydantic import Extra
 import pathlib
 import json
 import uuid
 import logging
+import yaml
 
 logger = logging.getLogger("polus.plugins")
 PLUGINS = {}
@@ -139,7 +148,8 @@ class Plugin(WIPPPluginManifest, PluginMethods):
         else:
             data["id"] = uuid.UUID(str(data["id"]))
 
-        data["version"] = cast_version(data["version"])
+        data["version"] = cast_version(data["version"])  # cast version
+
         super().__init__(**data)
 
         self.Config.allow_mutation = True
@@ -156,7 +166,7 @@ class Plugin(WIPPPluginManifest, PluginMethods):
         """Return list of versions of a Plugin"""
         return list(PLUGINS[name_cleaner(plugin.name)])
 
-    def to_compute(self, hardware_requirements: typing.Optional[dict] = None):
+    def new_schema(self, hardware_requirements: typing.Optional[dict] = None):
         data = deepcopy(self.manifest)
         return ComputePlugin(
             hardware_requirements=hardware_requirements, _from_old=True, **data
@@ -220,6 +230,8 @@ class ComputePlugin(ComputeSchema, PluginMethods):
         else:
             data["id"] = uuid.UUID(str(data["id"]))
 
+        data["version"] = cast_version(data["version"])  # cast version
+
         if _from_old:
 
             def _convert_input(d: dict):
@@ -255,17 +267,15 @@ class ComputePlugin(ComputeSchema, PluginMethods):
             data["outputs"] = [_convert_output(x) for x in data["outputs"]]
             data["pluginHardwareRequirements"] = {}
             data["ui"] = [_ui_in(x) for x in data["ui"]]  # inputs
-            data["ui"].extend([_ui_out(x) for x in data["outputs"]])  # type: ignore # outputs
+            data["ui"].extend([_ui_out(x) for x in data["outputs"]])  # outputs
 
         if hardware_requirements:
             for k, v in hardware_requirements.items():
                 data["pluginHardwareRequirements"][k] = v
-
-        data["version"] = cast_version(data["version"])
         super().__init__(**data)
         self.Config.allow_mutation = True
         self._io_keys = {i.name: i for i in self.inputs}
-        self._io_keys.update({o.name: o for o in self.outputs})  # type: ignore
+        self._io_keys.update({o.name: o for o in self.outputs})
 
         if self.author == "":
             logger.warning(
@@ -295,6 +305,37 @@ class ComputePlugin(ComputeSchema, PluginMethods):
         with open(path, "w") as fw:
             json.dump(self.manifest, fw, indent=4)
         logger.debug("Saved manifest to %s" % (path))
+
+    def _to_cwl(self):
+        cwl_dict = CWL_BASE_DICT
+        cwl_dict["inputs"] = {}
+        cwl_dict["outputs"] = {}
+        inputs = [input_to_cwl(x) for x in self.inputs]
+        inputs = inputs + [output_to_cwl(x) for x in self.outputs]
+        for inp in inputs:
+            cwl_dict["inputs"].update(inp)
+        outputs = [outputs_cwl(x) for x in self.outputs]
+        for out in outputs:
+            cwl_dict["outputs"].update(out)
+        cwl_dict["hints"]["DockerRequirement"]["dockerPull"] = self.containerId
+        return cwl_dict
+
+    def save_cwl(self, path: typing.Union[str, pathlib.Path]):
+        assert str(path).split(".")[-1] == "cwl", "Path must end in .cwl"
+        with open(path, "w") as file:
+            yaml.dump(self._to_cwl(), file)
+        return path
+
+    def _cwl_io(self):
+        return {
+            x.name: io_to_yml(x) for x in self._io_keys.values() if x.value is not None
+        }
+
+    def save_cwl_io(self, path):
+        assert str(path).split(".")[-1] == "yml", "Path must end in .yml"
+        with open(path, "w") as file:
+            yaml.dump(self._cwl_io(), file)
+        return path
 
     def __repr__(self) -> str:
         return PluginMethods.__repr__(self)
