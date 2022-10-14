@@ -4,6 +4,8 @@ cwlVersion: v1.2
 class: CommandLineTool
 
 requirements:
+  DockerRequirement:
+    dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
   InlineJavascriptRequirement: {}
 
 inputs:
@@ -21,13 +23,12 @@ inputs:
       prefix: --outDir
 
 outputs:
-  out:
+  outDir:
     type: Directory
+    outputBinding:
+      glob: $(inputs.outDir.dirname.replace('/', "") + "/*")
+    streamable: true
 
 baseCommand:
 - python3
 - /opt/executables/main.py
-
-hints:
-  DockerRequirement:
-    dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
