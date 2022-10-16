@@ -24,10 +24,13 @@ inputs:
 
 outputs:
   outDir:
-    type: Directory
+    type:
+      type: array
+      items:
+      - File
+      - Directory
     outputBinding:
-      glob: $(inputs.outDir.dirname.replace('/', "") + "/*")
-    streamable: true
+      glob: $("."+inputs.outDir.path + "/*")
 
 baseCommand:
 - python3

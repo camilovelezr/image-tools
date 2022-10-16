@@ -7,3 +7,4 @@ outDir:
   class: Directory
   location: /Users/camilovelezr/cwl_io/output
 photobleach: false
+entrypoint: [python3, ../main.py]

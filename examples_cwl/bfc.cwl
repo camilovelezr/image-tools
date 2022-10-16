@@ -1,34 +1,49 @@
-class: CommandLineTool
+#!/usr/bin/env cwl-runner
+
 cwlVersion: v1.2
+class: CommandLineTool
+
 requirements:
   DockerRequirement:
     dockerPull: labshare/polus-basic-flatfield-correction-plugin:1.2.6
-baseCommand: ["python3", "/main.py"]
+  EnvVarRequirement:
+    envDef:
+      HOME: /
+  InlineJavascriptRequirement: {}
+
 inputs:
   darkfield:
+    type: boolean
     inputBinding:
       prefix: --darkfield
-    type: boolean
   filePattern:
+    type: string
     inputBinding:
       prefix: --filePattern
-    type: string
   groupBy:
+    type: string?
     inputBinding:
       prefix: --groupBy
-    type: string?
   inpDir:
+    type: Directory
     inputBinding:
       prefix: --inpDir
-    type: Directory
   outDir:
+    type: WritableDirectory
     inputBinding:
       prefix: --outDir
-    type: Directory
+    streamable: true
   photobleach:
+    type: boolean
     inputBinding:
       prefix: --photobleach
-    type: boolean
+
 outputs:
   outDir:
-    type: Directory
+    type:
+      type: array
+      items:
+      - File
+      - Directory
+    outputBinding:
+      glob: $("."+inputs.outDir.path + "/*")
