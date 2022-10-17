@@ -11,7 +11,7 @@ requirements:
       HOME: /
   InitialWorkDirRequirement:
     listing:
-    - entryname: $(inputs.outDir.path)
+    - entryname: $(inputs.outDir)
       writable: true
       entry: "$({class: 'Directory', listing: []})"
   InlineJavascriptRequirement: {}
@@ -37,6 +37,7 @@ inputs:
     type: Directory
     inputBinding:
       prefix: --outDir
+    streamable: true
   photobleach:
     type: boolean
     inputBinding:
