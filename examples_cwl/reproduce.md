@@ -3,7 +3,7 @@
 ## 2. In a python shell run:
 ```
 import polus.plugins as pp
-pp.submit_plugin("https://raw.githubusercontent.com/PolusAI/polus-plugins/compute/formats/polus-ome-zarr-converter-plugin/plugin.json")
+pp.submit_plugin("https://raw.githubusercontent.com/kannon92/polus-plugins/compute/formats/polus-ome-zarr-converter-plugin/plugin.json")
 ```
 ## 3. In `cwl_io.py`, modify `inpDir` and `outDir` to reflect local absolute paths. 
 `inpDir` in my local machine contains:

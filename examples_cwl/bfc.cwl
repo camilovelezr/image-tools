@@ -6,14 +6,11 @@ class: CommandLineTool
 requirements:
   DockerRequirement:
     dockerPull: labshare/polus-basic-flatfield-correction-plugin:1.2.6
-  EnvVarRequirement:
-    envDef:
-      HOME: /
   InitialWorkDirRequirement:
     listing:
-    - entryname: $(inputs.outDir.path)
+    - entryname: output
       writable: true
-      entry: "$({class: 'Directory', listing: []})"
+      entry: $(inputs.outDir)
   InlineJavascriptRequirement: {}
 
 inputs:
@@ -50,4 +47,4 @@ outputs:
       - File
       - Directory
     outputBinding:
-      glob: $("."+inputs.outDir.path + "/*")
+      glob: $("."+inputs.outDir.basename + "/*")

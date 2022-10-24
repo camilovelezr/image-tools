@@ -15,9 +15,11 @@ p.photobleach = False
 # p.save_cwl_io("/Users/camilovelezr/bfcio.yml")
 # p.save_cwl("/Users/camilovelezr/cwl_io/bfc.cwl")
 lc = LoadingContext({"debug": True})
-rc = RuntimeContext({"streaming_allowed": "True"})
+rc = RuntimeContext()
 fac = Factory(loading_context=lc, runtime_context=rc)
 plugin_cwl = fac.make("/Users/camilovelezr/polus-plugins/examples_cwl/bfc.cwl")
 args = p._cwl_io()
+# args["outDir"] = args["outDir"]["location"]
+# args["outDir"]["class"] = "WritableDirectory" did not work
 # args["entrypoint"] = "python3, ../main.py"
 result = plugin_cwl(**args)

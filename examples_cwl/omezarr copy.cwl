@@ -5,27 +5,20 @@ class: CommandLineTool
 
 requirements:
   DockerRequirement:
-    dockerPull: labshare/polus-basic-flatfield-correction-plugin:1.2.6
+    dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
   InitialWorkDirRequirement:
     listing:
-    - entryname: $(inputs.outDir) //only this without entryname
+    - entryname: output
       writable: true
-      entry: "$({class: 'Directory', listing: []})"
+      entry: |-
+        $({class: 'Directory', path: inputs.outDir.path, basename: inputs.outDir.basename, listing:[]})
   InlineJavascriptRequirement: {}
 
 inputs:
-  darkfield:
-    type: boolean
-    inputBinding:
-      prefix: --darkfield
   filePattern:
     type: string
     inputBinding:
       prefix: --filePattern
-  groupBy:
-    type: string?
-    inputBinding:
-      prefix: --groupBy
   inpDir:
     type: Directory
     inputBinding:
@@ -34,11 +27,6 @@ inputs:
     type: Directory
     inputBinding:
       prefix: --outDir
-    streamable: true
-  photobleach:
-    type: boolean
-    inputBinding:
-      prefix: --photobleach
 
 outputs:
   outDir:
@@ -48,4 +36,8 @@ outputs:
       - File
       - Directory
     outputBinding:
-      glob: $("."+inputs.outDir.path + "/*")
+      glob: $("."+inputs.outDir.basename + "/*")
+
+baseCommand:
+- python3
+- /opt/executables/main.py

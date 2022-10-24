@@ -6,6 +6,11 @@ class: CommandLineTool
 requirements:
   DockerRequirement:
     dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
+  InitialWorkDirRequirement:
+    listing:
+    - entryname: outdir
+      writable: true
+      entry: $(inputs.outDir)
   InlineJavascriptRequirement: {}
 
 inputs:
@@ -30,7 +35,7 @@ outputs:
       - File
       - Directory
     outputBinding:
-      glob: $("."+inputs.outDir.path + "/*")
+      glob: $("."+inputs.outDir.basename + "/*")
 
 baseCommand:
 - python3
