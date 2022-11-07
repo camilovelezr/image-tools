@@ -1,9 +1,17 @@
 from copy import deepcopy
 from pprint import pformat
 import typing
+from ..cwl import CWL_BASE_DICT
 from ..io import Version, DuplicateVersionFound, _in_old_to_new, _ui_old_to_new
 from ..models import WIPPPluginManifest
-from ..utils import name_cleaner, cast_version
+from ..utils import (
+    name_cleaner,
+    input_to_cwl,
+    output_to_cwl,
+    outputs_cwl,
+    io_to_yml,
+    cast_version,
+)
 from ._plugin_methods import PluginMethods
 from ..models import PluginUIInput, PluginUIOutput
 from ..models import ComputeSchema

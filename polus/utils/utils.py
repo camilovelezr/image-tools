@@ -21,6 +21,13 @@ def cast_version(value):
 #     "boolean": "boolean"
 #     # not yet implemented: array
 # }
+cwl_input_types = {
+    "path": "Directory",  # always Dir? Yes
+    "string": "string",
+    "number": "double",
+    "boolean": "boolean"
+    # not yet implemented: array
+}
 
 
 def input_to_cwl(input):

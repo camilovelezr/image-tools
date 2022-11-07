@@ -1,0 +1,24 @@
+containers and algorithms, run: job
+
+1. generate SSID, create outputdir: SSID-nameofoutput (a lot of times it is outDir)
+
+cwl when provided outdir: it only takes folder name and generate folder name with that name
+
+when create workflow:
+specify output path where all the output data will get put
+that output path will be fed to runtimecontext
+we should use that rc for all plugins
+
+for each clt we specify different set of outputs
+
+specify output dir in plugins: relative, only dirname, if full path given: warning
+specify output dir in pipeline
+
+there is always a file copy that happens
+cwl: bunch of tmpdir
+then copies them into another dir specified in the output
+multiple tb of data? no good
+
+runtimecontext: let's use it to avoid it
+make a note about this!!!
+investigate zero copy cwl workflows
