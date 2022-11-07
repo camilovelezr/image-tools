@@ -1,4 +1,4 @@
-from ._io import Version
+from ..io import Version
 
 
 def name_cleaner(name: str) -> str:
@@ -14,13 +14,13 @@ def cast_version(value):
     return Version(version=value)
 
 
-cwl_input_types = {
-    "path": "Directory",  # always Dir? Yes
-    "string": "string",
-    "number": "double",
-    "boolean": "boolean"
-    # not yet implemented: array
-}
+# input_types = {
+#     "path": "Directory",  # always Dir?
+#     "string": "string",
+#     "number": "double",
+#     "boolean": "boolean"
+#     # not yet implemented: array
+# }
 
 
 def input_to_cwl(input):
