@@ -8,7 +8,7 @@ requirements:
     dockerPull: labshare/polus-basic-flatfield-correction-plugin:1.2.6
   InitialWorkDirRequirement:
     listing:
-    - entryname: output
+    - entryname: outdir
       writable: true
       entry: $(inputs.outDir)
   InlineJavascriptRequirement: {}
@@ -47,4 +47,4 @@ outputs:
       - File
       - Directory
     outputBinding:
-      glob: $("."+inputs.outDir.basename + "/*")
+      glob: $(inputs.outDir.path)

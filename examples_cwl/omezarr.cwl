@@ -8,8 +8,7 @@ requirements:
     dockerPull: labshare/polus-ome-zarr-converter-plugin:compute-0.2.1
   InitialWorkDirRequirement:
     listing:
-    - entryname: outdir
-      writable: true
+    - writable: true
       entry: $(inputs.outDir)
   InlineJavascriptRequirement: {}
 
@@ -35,7 +34,7 @@ outputs:
       - File
       - Directory
     outputBinding:
-      glob: $("."+inputs.outDir.basename + "/*")
+      glob: $(inputs.outDir.path)
 
 baseCommand:
 - python3
