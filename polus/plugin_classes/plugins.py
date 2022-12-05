@@ -1,7 +1,6 @@
 from copy import deepcopy
 from pprint import pformat
 import typing
-from ..cwl import CWL_BASE_DICT
 from ..io import Version, DuplicateVersionFound, _in_old_to_new, _ui_old_to_new
 from ..models import WIPPPluginManifest
 from ..utils import (
@@ -304,121 +303,121 @@ class ComputePlugin(ComputeSchema, PluginMethods):
             json.dump(self.manifest, fw, indent=4)
         logger.debug("Saved manifest to %s" % (path))
 
-    def _to_cwl(self):
-        cwl_dict = CWL_BASE_DICT
-        cwl_dict["inputs"] = {}
-        cwl_dict["outputs"] = {}
-        inputs = [input_to_cwl(x) for x in self.inputs]
-        inputs = inputs + [output_to_cwl(x) for x in self.outputs]
-        for inp in inputs:
-            cwl_dict["inputs"].update(inp)
-        outputs = [outputs_cwl(x) for x in self.outputs]
-        for out in outputs:
-            cwl_dict["outputs"].update(out)
-        cwl_dict["hints"]["DockerRequirement"]["dockerPull"] = self.containerId
-        return cwl_dict
+    # def _to_cwl(self):
+    #     cwl_dict = CWL_BASE_DICT
+    #     cwl_dict["inputs"] = {}
+    #     cwl_dict["outputs"] = {}
+    #     inputs = [input_to_cwl(x) for x in self.inputs]
+    #     inputs = inputs + [output_to_cwl(x) for x in self.outputs]
+    #     for inp in inputs:
+    #         cwl_dict["inputs"].update(inp)
+    #     outputs = [outputs_cwl(x) for x in self.outputs]
+    #     for out in outputs:
+    #         cwl_dict["outputs"].update(out)
+    #     cwl_dict["hints"]["DockerRequirement"]["dockerPull"] = self.containerId
+    #     return cwl_dict
 
-    def save_cwl(self, path: typing.Union[str, pathlib.Path]):
-        assert str(path).split(".")[-1] == "cwl", "Path must end in .cwl"
-        with open(path, "w") as file:
-            yaml.dump(self._to_cwl(), file)
-        return path
+    # def save_cwl(self, path: typing.Union[str, pathlib.Path]):
+    #     assert str(path).split(".")[-1] == "cwl", "Path must end in .cwl"
+    #     with open(path, "w") as file:
+    #         yaml.dump(self._to_cwl(), file)
+    #     return path
 
-    def _cwl_io(self):
-        return {
-            x.name: io_to_yml(x) for x in self._io_keys.values() if x.value is not None
-        }
+    # def _cwl_io(self):
+    #     return {
+    #         x.name: io_to_yml(x) for x in self._io_keys.values() if x.value is not None
+    #     }
 
-    def save_cwl_io(self, path):
-        assert str(path).split(".")[-1] == "yml", "Path must end in .yml"
-        with open(path, "w") as file:
-            yaml.dump(self._cwl_io(), file)
-        return path
-
-    def __repr__(self) -> str:
-        return PluginMethods.__repr__(self)
-
-
-class Plugin(WIPPPluginManifest, PluginMethods):
-    """Required until json schema is fixed"""
-
-    id: uuid.UUID
-
-    class Config:
-        extra = Extra.allow
-        allow_mutation = False
-
-    def __init__(self, _uuid: bool = True, **data):
-
-        if _uuid:
-            data["id"] = uuid.uuid4()
-        else:
-            data["id"] = uuid.UUID(str(data["id"]))
-
-        data["version"] = cast_version(data["version"])  # cast version
-
-        super().__init__(**data)
-
-        self.Config.allow_mutation = True
-        self._io_keys = {i.name: i for i in self.inputs}
-        self._io_keys.update({o.name: o for o in self.outputs})
-
-        if self.author == "":
-            logger.warning(
-                f"The plugin ({self.name}) is missing the author field. This field is not required but should be filled in."
-            )
-
-    @property
-    def versions(plugin):  # cannot be in PluginMethods because PLUGINS lives here
-        """Return list of versions of a Plugin"""
-        return list(PLUGINS[name_cleaner(plugin.name)])
-
-    def to_compute(
-        self, hardware_requirements: typing.Optional[dict] = None
-    ) -> ComputePlugin:
-        data = deepcopy(self.manifest)
-        return ComputePlugin(
-            hardware_requirements=hardware_requirements, _from_old=True, **data
-        )
-
-    def save_manifest(
-        self,
-        path: typing.Union[str, pathlib.Path],
-        hardware_requirements: typing.Optional[dict] = None,
-        compute: bool = False,
-    ):
-        if compute:
-            with open(path, "w") as fw:
-                self.to_compute(
-                    hardware_requirements=hardware_requirements
-                ).save_manifest(path)
-        else:
-            with open(path, "w") as fw:
-                d = self.manifest
-                json.dump(
-                    d,
-                    fw,
-                    indent=4,
-                )
-
-        logger.debug("Saved manifest to %s" % (path))
-
-    def __setattr__(self, name, value):
-        PluginMethods.__setattr__(self, name, value)
-
-    @property
-    def _config_file(self):
-        m = self._config
-        m["class"] = "OldPlugin"
-        return m
-
-    def save_config(self, path: typing.Union[str, pathlib.Path]):
-        with open(path, "w") as fw:
-            json.dump(self._config_file, fw, indent=4)
-        logger.debug("Saved config to %s" % (path))
+    # def save_cwl_io(self, path):
+    #     assert str(path).split(".")[-1] == "yml", "Path must end in .yml"
+    #     with open(path, "w") as file:
+    #         yaml.dump(self._cwl_io(), file)
+    #     return path
 
     def __repr__(self) -> str:
         return PluginMethods.__repr__(self)
+
+
+# class Plugin(WIPPPluginManifest, PluginMethods):
+#     """Required until json schema is fixed"""
+
+#     id: uuid.UUID
+
+#     class Config:
+#         extra = Extra.allow
+#         allow_mutation = False
+
+#     def __init__(self, _uuid: bool = True, **data):
+
+#         if _uuid:
+#             data["id"] = uuid.uuid4()
+#         else:
+#             data["id"] = uuid.UUID(str(data["id"]))
+
+#         data["version"] = cast_version(data["version"])  # cast version
+
+#         super().__init__(**data)
+
+#         self.Config.allow_mutation = True
+#         self._io_keys = {i.name: i for i in self.inputs}
+#         self._io_keys.update({o.name: o for o in self.outputs})
+
+#         if self.author == "":
+#             logger.warning(
+#                 f"The plugin ({self.name}) is missing the author field. This field is not required but should be filled in."
+#             )
+
+#     @property
+#     def versions(plugin):  # cannot be in PluginMethods because PLUGINS lives here
+#         """Return list of versions of a Plugin"""
+#         return list(PLUGINS[name_cleaner(plugin.name)])
+
+#     def to_compute(
+#         self, hardware_requirements: typing.Optional[dict] = None
+#     ) -> ComputePlugin:
+#         data = deepcopy(self.manifest)
+#         return ComputePlugin(
+#             hardware_requirements=hardware_requirements, _from_old=True, **data
+#         )
+
+#     def save_manifest(
+#         self,
+#         path: typing.Union[str, pathlib.Path],
+#         hardware_requirements: typing.Optional[dict] = None,
+#         compute: bool = False,
+#     ):
+#         if compute:
+#             with open(path, "w") as fw:
+#                 self.to_compute(
+#                     hardware_requirements=hardware_requirements
+#                 ).save_manifest(path)
+#         else:
+#             with open(path, "w") as fw:
+#                 d = self.manifest
+#                 json.dump(
+#                     d,
+#                     fw,
+#                     indent=4,
+#                 )
+
+#         logger.debug("Saved manifest to %s" % (path))
+
+#     def __setattr__(self, name, value):
+#         PluginMethods.__setattr__(self, name, value)
+
+#     @property
+#     def _config_file(self):
+#         m = self._config
+#         m["class"] = "OldPlugin"
+#         return m
+
+#     def save_config(self, path: typing.Union[str, pathlib.Path]):
+#         with open(path, "w") as fw:
+#             json.dump(self._config_file, fw, indent=4)
+#         logger.debug("Saved config to %s" % (path))
+
+#     def __repr__(self) -> str:
+#         return PluginMethods.__repr__(self)
 
 
 def load_plugin(

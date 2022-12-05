@@ -3,13 +3,18 @@ import json
 import random
 import signal
 import typing
-import re
-from copy import deepcopy
-from ..models import PluginUIInput, PluginUIOutput, ComputeSchema
+from ..cwl import CWL_BASE_DICT
+from ..utils import (
+    input_to_cwl,
+    output_to_cwl,
+    outputs_cwl,
+    io_to_yml,
+)
 import pathlib
 import fsspec
 from python_on_whales import docker
 import logging
+import yaml
 
 logger = logging.getLogger("polus.plugins")
 
@@ -186,6 +191,37 @@ class PluginMethods:
                 )
 
         super().__setattr__(name, value)
+
+    def _to_cwl(self):
+        cwl_dict = CWL_BASE_DICT
+        cwl_dict["inputs"] = {}
+        cwl_dict["outputs"] = {}
+        inputs = [input_to_cwl(x) for x in self.inputs]
+        inputs = inputs + [output_to_cwl(x) for x in self.outputs]
+        for inp in inputs:
+            cwl_dict["inputs"].update(inp)
+        outputs = [outputs_cwl(x) for x in self.outputs]
+        for out in outputs:
+            cwl_dict["outputs"].update(out)
+        cwl_dict["hints"]["DockerRequirement"]["dockerPull"] = self.containerId
+        return cwl_dict
+
+    def save_cwl(self, path: typing.Union[str, pathlib.Path]):
+        assert str(path).split(".")[-1] == "cwl", "Path must end in .cwl"
+        with open(path, "w") as file:
+            yaml.dump(self._to_cwl(), file)
+        return path
+
+    def _cwl_io(self):
+        return {
+            x.name: io_to_yml(x) for x in self._io_keys.values() if x.value is not None
+        }
+
+    def save_cwl_io(self, path):
+        assert str(path).split(".")[-1] == "yml", "Path must end in .yml"
+        with open(path, "w") as file:
+            yaml.dump(self._cwl_io(), file)
+        return path
 
     def __lt__(self, other):
         return self.version < other.version
