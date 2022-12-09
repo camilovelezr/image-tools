@@ -11,7 +11,7 @@ p = get_plugin("OmeZarrConverter", "0.2.0").to_compute()
 p.filePatter = data.subset.intensity.patterns["all"].pattern
 p.inpDir = "/Users/camilovelezr/cwl_io/input"
 p.outDir = "/Users/camilovelezr/cwl_io/output"
-# p.run(gpus=None)
+p.run(gpus=None)
 # p.darkfield = False
 # p.photobleach = False
 # p.save_cwl_io("/Users/camilovelezr/polus-plugins/examples_cwl/omezarr_entry.yml")
