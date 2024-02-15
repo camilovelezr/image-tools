@@ -526,6 +526,7 @@ CWL_INPUT_TYPES = {
     "collection": "Directory",
     "enum": "string",  # for compatibility with workflows
     "stitchingVector": "Directory",
+    "integer": "long",
     # not yet implemented: array
 }
 
